@@ -1,3 +1,5 @@
+from bs4 import BeautifulSoup
+
 def load_html(filename):
     try:
         with open(filename, "r", encoding="utf-8") as file:
@@ -6,8 +8,9 @@ def load_html(filename):
         print(f"Error: Could not find {filename}")
         return None
 
-
 html = load_html("employee_directory.html")
 
 if html is not None:
+    soup = BeautifulSoup(html, "html.parser")
+    print(soup.title.get_text(strip=True))
     print("HTML file loaded successfully.")
