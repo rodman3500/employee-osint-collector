@@ -1,4 +1,6 @@
 from bs4 import BeautifulSoup
+import csv
+
 
 def load_html(filename):
     try:
@@ -8,14 +10,18 @@ def load_html(filename):
         print(f"Error: Could not find {filename}")
         return None
 
+
 html = load_html("employee_results.html")
 
 if html is not None:
     soup = BeautifulSoup(html, "html.parser")
+
     print(soup.title.get_text(strip=True))
     print("HTML file loaded successfully.")
 
     employees = soup.find_all("div", class_="employee-result")
+
+    employee_data = []
 
     for employee in employees:
         name_tag = employee.find("h3", class_="emp-name-margin")
@@ -25,4 +31,18 @@ if html is not None:
             name = name_tag.get_text(strip=True)
             title = title_tag.get_text(strip=True)
 
-            print(name, "-", title)
+            department_tag = employee.find("div", class_="department-links")
+
+            if department_tag:
+                department = department_tag.get_text(" ", strip=True)
+            else:
+                department = "N/A"
+
+            employee_data.append([name, title, department])
+
+    with open("employees.csv", "w", newline="", encoding="utf-8") as file:
+        writer = csv.writer(file)
+        writer.writerow(["Name", "Title", "Department"])
+        writer.writerows(employee_data)
+
+    print(f"Saved {len(employee_data)} employees to employees.csv")
